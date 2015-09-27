@@ -100,8 +100,8 @@ function phpcompat_array_column($input = null, $column_key = null, $index_key = 
 
             // value used as a key in result array must be not null
             if (null !== $index_key && isset($input_value[$index_key])) {
-                // stringify output key, it will be automatically coerced
-                // to an int or a string by PHP internals
+                // stringify output key in case it is an object, then it will
+                // be coerced by PHP internals to an integer, if neccessary
                 $output[(string) $input_value[$index_key]] = $output_value;
             } else {
                 $output[] = $output_value;
