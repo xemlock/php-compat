@@ -20,7 +20,7 @@ if (!function_exists('array_column')) {
     function array_column($input = null, $column_key = null, $index_key = null)
     {
         $num_args = func_num_args();
-    
+
         if ($num_args > 3) {
             trigger_error(
                 sprintf('array_column() expects at most 3 parameters, %d given', $num_args),
@@ -28,7 +28,7 @@ if (!function_exists('array_column')) {
             );
             return null;
         }
-    
+
         if ($num_args < 2) {
             trigger_error(
                 sprintf('array_column() expects at least 2 parameters, %d given', $num_args),
@@ -36,7 +36,7 @@ if (!function_exists('array_column')) {
             );
             return null;
         }
-    
+
         if (!is_array($input)) {
             trigger_error(
                 sprintf('array_column() expects parameter 1 to be array, %s given', gettype($input)),
@@ -44,7 +44,7 @@ if (!function_exists('array_column')) {
             );
             return null;
         }
-    
+
         if (null !== $column_key
             && !is_int($column_key)
             && !is_float($column_key)
@@ -57,7 +57,7 @@ if (!function_exists('array_column')) {
             );
             return false;
         }
-    
+
         if (null !== $index_key
             && !is_int($index_key)
             && !is_float($index_key)
@@ -70,7 +70,7 @@ if (!function_exists('array_column')) {
             );
             return false;
         }
-    
+
         if ($column_key !== null) {
             if (is_int($column_key) || is_float($column_key)) {
                 $column_key = (int) $column_key;
@@ -78,7 +78,7 @@ if (!function_exists('array_column')) {
                 $column_key = (string) $column_key;
             }
         }
-    
+
         if ($index_key !== null) {
             if (is_int($index_key) || is_float($index_key)) {
                 $index_key = (int) $index_key;
@@ -86,9 +86,9 @@ if (!function_exists('array_column')) {
                 $index_key = (string) $index_key;
             }
         }
-    
+
         $output = array();
-    
+
         foreach ($input as $input_value) {
             // $input_value must be an array, otherwise it will be ignored
             $is_valid_value = is_array($input_value) && (
@@ -98,25 +98,25 @@ if (!function_exists('array_column')) {
                 isset($input_value[$column_key]) ||
                 array_key_exists($column_key, $input_value)
             );
-    
+
             if ($is_valid_value) {
                 if (null === $column_key) {
                     $output_value = $input_value;
                 } else {
                     $output_value = $input_value[$column_key];
                 }
-    
+
                 // value used as a key in result array must be not null
                 if (null !== $index_key && isset($input_value[$index_key])) {
                     // stringify output key, it will be automatically coerced
-                    // to an int or a string
+                    // to an int or a string by PHP internals
                     $output[(string) $input_value[$index_key]] = $output_value;
                 } else {
                     $output[] = $output_value;
                 }
             }
         }
-    
+
         return $output;
     }
 }
@@ -139,11 +139,19 @@ if (!function_exists('array_replace')) {
      * @param array $array2...  The array from which elements will be extracted
      * @return array Returns an array, or NULL if an error occurs
      */
-    function array_replace(array $array1, array $array2)
+    function array_replace(array $array1 = null, array $array2 = null)
     {
         $args = func_get_args();
         $num_args = func_num_args();
-    
+
+        if ($num_args < 1) {
+            trigger_error(
+                sprintf('array_replace() expects at least 1 parameter, %d given', $num_args),
+                E_USER_WARNING
+            );
+            return null;
+        }
+
         $res = array();
         for ($i = 0; $i < $num_args; ++$i) {
             if (is_array($args[$i])) {
@@ -151,11 +159,14 @@ if (!function_exists('array_replace')) {
                     $res[$key] = $val;
                 }
             } else {
-                trigger_error(__FUNCTION__ .'(): Argument #' . ($i + 1) . ' is not an array', E_USER_WARNING);
+                trigger_error(
+                    sprintf('array_replace(): Argument #%d is not an array', $i + 1),
+                    E_USER_WARNING
+                );
                 return null;
             }
         }
-    
+
         return $res;
     }
 }
@@ -171,7 +182,7 @@ if (!function_exists('array_replace_recursive')) {
             if (!isset($array[$key]) || (isset($array[$key]) && !is_array($array[$key]))) {
                 $array[$key] = array();
             }
-    
+
             // overwrite the value in the base array
             if (is_array($value)) {
                 $value = __phpcompat_array_replace_recursive($array[$key], $value);
@@ -245,13 +256,13 @@ if (!function_exists('stream_resolve_include_path')) {
     {
         $dirs = explode(PATH_SEPARATOR, get_include_path());
         array_unshift($dirs, getcwd());
-    
+
         foreach ($dirs as $dir) {
             if (false !== ($path = realpath($filename))) {
                 return $path;
             }
         }
-    
+
         return false;
     }
 }
@@ -275,15 +286,15 @@ if (!interface_exists('SessionHandlerInterface')) {
     interface SessionHandlerInterface
     {
         public function close();
-    
+
         public function destroy($session_id);
-    
+
         public function gc($maxlifetime);
-    
+
         public function open($save_path, $name);
-    
+
         public function read($session_id);
-    
+
         public function write($session_id, $session_data);
     }
 }

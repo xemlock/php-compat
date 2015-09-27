@@ -78,6 +78,13 @@ $compiled = implode('', array_merge(
     $output_classes
 ));
 
+$compiled = implode("\n",
+    array_map(
+        'rtrim',
+        explode("\n", $compiled)
+    )
+);
+
 @mkdir('dist');
 file_put_contents('dist/phpcompat.php', trim($compiled));
 
