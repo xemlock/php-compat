@@ -106,13 +106,29 @@ if (!function_exists('array_column')) {
                     $output_value = $input_value[$column_key];
                 }
 
-                // value used as a key in result array must be not null
+                $output_key = null;
+
+                // value used as an index_key in result array must be not null
                 if (null !== $index_key && isset($input_value[$index_key])) {
-                    // stringify output key in case it is an object, then it will
-                    // be coerced by PHP internals to an integer, if neccessary
-                    $output[(string) $input_value[$index_key]] = $output_value;
-                } else {
+                    // output key must be a string (or an object with __toString()),
+                    // or an integer, but not float, as the latter will not be
+                    // coerced to integer (HHVM coerces it, but I consider it as an
+                    // incompatibility)
+                    $output_key = $input_value[$index_key];
+
+                    if (is_string($output_key)
+                        || (is_object($output_key) && method_exists($output_key, '__toString'))
+                    ) {
+                        $output_key = (string) $output_key;
+                    } elseif (!is_int($output_key)) {
+                        $output_key = null;
+                    }
+                }
+
+                if ($output_key === null) {
                     $output[] = $output_value;
+                } else {
+                    $output[$output_key] = $output_value;
                 }
             }
         }
